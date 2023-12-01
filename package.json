@@ -1,0 +1,48 @@
+{
+  "name": "quickstate",
+  "version": "1.0.0",
+  "description": "QuickState is a lightweight and highly efficient state management library for React. It provides fast performance with minimal overhead. Thanks to its user-friendly API, it allows for easy integration and seamless state management.",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/xpatrykk/quickstate.git"
+  },
+  "packageManager": "pnpm@8.10.2",
+  "scripts": {
+    "test": "pnpm --recursive --if-present test",
+    "lint": "pnpm --recursive --if-present lint"
+  },
+  "keywords": [
+    "flux",
+    "javascript",
+    "react",
+    "reactjs",
+    "redux",
+    "state",
+    "state-container",
+    "state-management",
+    "store",
+    "toolkit",
+    "typescript"
+  ],
+  "author": {
+    "name": "Patryk Parcheta",
+    "email": "patrykparcheta93@gmail.com",
+    "url": "https://github.com/xpatrykk"
+  },
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/xpatrykk/quickstate/issues"
+  },
+  "homepage": "https://github.com/xpatrykk/quickstate",
+  "devDependencies": {
+    "@types/node": "^20.8.10",
+    "@typescript-eslint/eslint-plugin": "^6.10.0",
+    "@typescript-eslint/parser": "^6.10.0",
+    "eslint": "^8.53.0",
+    "eslint-config-prettier": "^9.0.0",
+    "eslint-plugin-prettier": "^5.0.1",
+    "ts-node": "^10.9.1",
+    "prettier": "^3.0.3",
+    "typescript": "^5.2.2"
+  }
+}
