@@ -1,9 +1,11 @@
 import {reduceCount} from "../actions";
 import {store} from "../store";
+import type {MyState} from "../types";
 
 describe("reduceCount action", () => {
-	const initialState = {
+	const initialState: MyState = {
 		count: 0,
+		countLoading: false,
 	};
 
 	beforeEach(() => {
