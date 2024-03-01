@@ -17,13 +17,13 @@ createAction.
 The action-creating function should return a `State | void | undefined`
 
 ```typescript
-type CreateActionActionReturn<State extends object> = State | void | undefined;
+type CreateActionReturn<State extends object> = State | void | undefined;
 ```
 
 ## Creating action without payload
 
 ```typescript
-type Action<State extends object> = (state: Draft<State>) => CreateActionActionReturn<Draft<State>>;
+type Action<State extends object> = (state: Draft<State>) => CreateActionReturn<Draft<State>>;
 
 createAction(action: Action<State>): () => void;
 ```
@@ -49,7 +49,7 @@ increaseCount();
 export type ActionWithPayload<State extends object, Payload> = (
     state: Draft<State>,
     payload: Payload
-) => CreateActionActionReturn<Draft<State>>;
+) => CreateActionReturn<Draft<State>>;
 
 createAction<Payload>(action: ActionWithPayload<State, Payload>): (payload: Payload) => void;
 ```

@@ -1,7 +1,19 @@
 import {produce} from "immer";
-import {Action, ActionWithPayload, MakeStoreConfig, Selector, Store, StoreBase} from "./types";
+import {
+	Action,
+	ActionWithPayload,
+	AsyncActionCreator,
+	AsyncActionFulfilledMeta,
+	AsyncActionRejectedMeta,
+	AsyncActionWithPayload,
+	MakeStoreConfig,
+	Selector,
+	Store,
+	StoreBase,
+} from "./types";
 import {isActionWithPayload} from "./utils";
 import React, {createContext, useContext, useEffect, useState} from "react";
+import {getWithStateProviderHoc} from "./with-state-provider";
 
 export const makeStore = <State extends object>(config: MakeStoreConfig<State>): Store<State> => {
 	const createStore = (): StoreBase<State> => {
@@ -41,10 +53,43 @@ export const makeStore = <State extends object>(config: MakeStoreConfig<State>):
 			} as any;
 		};
 
+		const createAsyncAction: Store<State>["createAsyncAction"] = <Creator extends AsyncActionCreator>(
+			action: AsyncActionWithPayload<State, Creator>
+		) => {
+			return async function (this: any, ...args: Parameters<Creator>) {
+				const {creator, onRejected, onFulfilled, onPending} = action;
+
+				publishNewState(produce(getState(), (draft) => onPending(draft)));
+
+				try {
+					const resolvedValue = await creator(...args);
+
+					const fulfilledMeta: AsyncActionFulfilledMeta<Creator> = {
+						parameters: args,
+						result: resolvedValue as Awaited<ReturnType<Creator>>,
+					};
+
+					publishNewState(produce(getState(), (draft) => onFulfilled(draft, fulfilledMeta)));
+
+					return fulfilledMeta;
+				} catch (e) {
+					const rejectedMeta: AsyncActionRejectedMeta<Creator> = {
+						parameters: args,
+						reason: e,
+					};
+
+					publishNewState(produce(getState(), (draft) => onRejected(draft, rejectedMeta)));
+
+					return rejectedMeta;
+				}
+			};
+		};
+
 		return {
 			setState,
 			getState,
 			createAction,
+			createAsyncAction,
 			subscribe,
 		};
 	};
@@ -83,9 +128,12 @@ export const makeStore = <State extends object>(config: MakeStoreConfig<State>):
 			return useEnhancedSelector();
 		};
 
+	const withStateProvider = getWithStateProviderHoc(Provider);
+
 	return {
 		...store,
 		Provider,
 		createSelector,
+		withStateProvider,
 	};
 };

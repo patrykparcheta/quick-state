@@ -6,6 +6,6 @@ export const store = makeStore<MyState>({
 	initialState,
 });
 
-const {createSelector, createAction, Provider: MyStoreProvider} = store;
+const {createSelector, createAsyncAction, createAction, Provider: MyStoreProvider, withStateProvider} = store;
 
-export {MyStoreProvider, createAction, createSelector};
+export {MyStoreProvider, createAction, createAsyncAction, createSelector, withStateProvider};

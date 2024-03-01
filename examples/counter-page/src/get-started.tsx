@@ -1,19 +1,24 @@
 import React from "react";
-import {Button} from "@mui/material";
-import {increaseCount} from "./state";
+import {increaseCountUsingAsyncAction} from "./state";
+import {LoadingButton} from "@mui/lab";
+import {selectLoading} from "./state";
 
 export const GetStarted = () => {
-	const handleButtonClick = () => {
-		[...Array(10)].forEach(() => {
-			increaseCount();
-		});
-	};
+	const loading = selectLoading();
+
+	const handleButtonClick = () => increaseCountUsingAsyncAction(50);
 
 	return (
 		<div>
-			<Button variant={"outlined"} color={"success"} size={"large"} onClick={handleButtonClick}>
+			<LoadingButton
+				loading={loading}
+				variant={"outlined"}
+				color={"success"}
+				size={"large"}
+				onClick={handleButtonClick}
+			>
 				🚀
-			</Button>
+			</LoadingButton>
 		</div>
 	);
 };
