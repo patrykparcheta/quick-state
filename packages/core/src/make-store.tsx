@@ -4,6 +4,7 @@ import {
 	ActionWithPayload,
 	AsyncActionCreator,
 	AsyncActionFulfilledMeta,
+	AsyncActionPendingMeta,
 	AsyncActionRejectedMeta,
 	AsyncActionWithPayload,
 	MakeStoreConfig,
@@ -59,7 +60,11 @@ export const makeStore = <State extends object>(config: MakeStoreConfig<State>):
 			return async function (this: any, ...args: Parameters<Creator>) {
 				const {creator, onRejected, onFulfilled, onPending} = action;
 
-				publishNewState(produce(getState(), (draft) => onPending(draft)));
+				const pendingMeta: AsyncActionPendingMeta<Creator> = {
+					parameters: args,
+				};
+
+				publishNewState(produce(getState(), (draft) => onPending(draft, pendingMeta)));
 
 				try {
 					const resolvedValue = await creator(...args);

@@ -17,6 +17,10 @@ export type ActionWithPayload<State extends object, Payload> = (
 
 export type AsyncActionCreator = (...args: any[]) => Promise<any>;
 
+export type AsyncActionPendingMeta<Creator extends AsyncActionCreator> = {
+	parameters: Parameters<Creator>;
+};
+
 export type AsyncActionFulfilledMeta<Creator extends AsyncActionCreator> = {
 	parameters: Parameters<Creator>;
 	result: Awaited<ReturnType<Creator>>;
@@ -33,7 +37,7 @@ export type AsyncActionMeta<Creator extends AsyncActionCreator> =
 
 export type AsyncActionWithPayload<State extends object, Creator extends AsyncActionCreator> = {
 	creator: Creator;
-	onPending: (state: Draft<State>) => CreateActionReturn<Draft<State>>;
+	onPending: (state: Draft<State>, meta: AsyncActionPendingMeta<Creator>) => CreateActionReturn<Draft<State>>;
 	onFulfilled: (state: Draft<State>, meta: AsyncActionFulfilledMeta<Creator>) => CreateActionReturn<Draft<State>>;
 	onRejected: (state: Draft<State>, meta: AsyncActionRejectedMeta<Creator>) => CreateActionReturn<Draft<State>>;
 };
