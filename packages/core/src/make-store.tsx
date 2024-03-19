@@ -121,11 +121,15 @@ export const makeStore = <State extends object>(config: MakeStoreConfig<State>):
 
 				useEffect(() => {
 					const updateSelectedState = () => {
-						setSelectedState(selector(contextStore.getState()));
+						const selectedValue = selector(contextStore.getState());
+
+						if (JSON.stringify(selectedValue) !== JSON.stringify(selectedState)) {
+							setSelectedState(selector(contextStore.getState()));
+						}
 					};
 
 					return contextStore.subscribe(updateSelectedState);
-				}, [selector, contextStore]);
+				}, [selectedState, selector, contextStore]);
 
 				return selectedState;
 			};
