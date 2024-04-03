@@ -1,4 +1,5 @@
 packages:
-  - "packages/*"
-  - "examples/*"
+  - "dev-tools-extension"
   - "docs"
+  - "examples/*"
+  - "packages/*"

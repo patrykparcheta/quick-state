@@ -1,0 +1,45 @@
+{
+	"manifest_version": 3,
+	"name": "QuickState - DevTools",
+	"version": "1.0",
+	"description": "QuickState DevTools is an advanced tool for React developers, enabling real-time tracking and management of application state using the QuickState state management library. With this extension, developers can effortlessly monitor state changes, analyze current state values, and debug their applications with unmatched ease and efficiency. QuickState DevTools provides an intuitive interface and a suite of powerful features, designed to streamline the development process and enhance productivity. Elevate your React development experience by integrating QuickState DevTools into your workflow, and unlock the full potential of QuickState for optimal application performance.",
+	"devtools_page": "index.html",
+	"action": {
+		"default_icon": {
+			"512": "icons/icon-512x512.png"
+		}
+	},
+	"icons": {
+		"72": "icons/icon-72x72.png",
+		"96": "icons/icon-96x96.png",
+		"128": "icons/icon-128x128.png",
+		"144": "icons/icon-144x144.png",
+		"152": "icons/icon-152x152.png",
+		"192": "icons/icon-192x192.png",
+		"384": "icons/icon-384x384.png",
+		"512": "icons/icon-512x512.png"
+	},
+	"permissions": [
+		"tabs",
+		"scripting",
+		"activeTab",
+		"storage"
+	],
+	"background": {
+		"service_worker": "background.js"
+	},
+	"content_scripts": [
+		{
+			"matches": [
+				"<all_urls>"
+			],
+			"js": [
+				"content-script.js"
+			]
+		}
+	],
+	"host_permissions": [
+		"http://*/*",
+		"https://*/*"
+	]
+}
