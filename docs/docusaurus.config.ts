@@ -6,7 +6,7 @@ const config: Config = {
 	title: "QuickState",
 	tagline:
 		"QuickState is a lightweight and highly efficient state management library for React. It provides fast performance with minimal overhead. Thanks to its user-friendly API, it allows for easy integration and seamless state management.",
-	favicon: "assets/logo-sign.png",
+	favicon: "assets/logo-square.svg",
 	url: "https://quickstate.vercel.app",
 	baseUrl: "/",
 	onBrokenLinks: "throw",

@@ -1,12 +1,20 @@
 import type {Draft} from "immer";
 import React from "react";
 import {getWithStateProviderHoc} from "./with-state-provider";
+import type {StateUpdateVariants} from "./dev-tools";
 
 export interface MakeStoreConfig<State extends object> {
 	initialState: State;
 }
 
-type CreateActionReturn<State extends object> = State | void | undefined;
+export type CreateActionReturn<State extends object> = State | void | undefined;
+
+export type TransformState<State extends object> = (
+	producer: StateTransformer<State>,
+	actionDetails: StateUpdateVariants
+) => void;
+
+export type StateTransformer<State extends object> = (state: Draft<State>) => any;
 
 export type Action<State extends object> = (state: Draft<State>) => CreateActionReturn<Draft<State>>;
 
@@ -44,11 +52,17 @@ export type AsyncActionWithPayload<State extends object, Creator extends AsyncAc
 
 export interface StoreBase<State extends object> {
 	getState: () => State;
-	setState(state: State): void;
-	createAction(action: Action<State>): () => void;
-	createAction<Payload>(action: ActionWithPayload<State, Payload>): (payload: Payload) => void;
+	setState(state: State, actionName?: string): void;
+	setKeyValue<Key extends keyof State, KeyValue extends State[Key] extends object ? Partial<State[Key]> : State[Key]>(
+		key: Key,
+		value: KeyValue,
+		actionName?: string
+	): void;
+	createAction(action: Action<State>, actionName?: string): () => void;
+	createAction<Payload>(action: ActionWithPayload<State, Payload>, actionName?: string): (payload: Payload) => void;
 	createAsyncAction<Creator extends AsyncActionCreator>(
-		action: AsyncActionWithPayload<State, Creator>
+		action: AsyncActionWithPayload<State, Creator>,
+		actionName?: string
 	): (...args: Parameters<Creator>) => Promise<AsyncActionMeta<Creator>>;
 	subscribe: (listener: () => void) => () => void;
 }
@@ -59,6 +73,7 @@ export type WithStateProviderHoc = ReturnType<typeof getWithStateProviderHoc>;
 
 export interface Store<State extends object> extends StoreBase<State> {
 	createSelector: <Selected extends Selector<State>>(selector: Selected) => () => ReturnType<Selected>;
+	useSelectValue: <Key extends keyof State>(key: Key) => State[Key];
 	Provider: ({children}: {children: React.ReactNode}) => React.JSX.Element;
 	withStateProvider: WithStateProviderHoc;
 }
