@@ -1,4 +1,9 @@
-import type {AsyncActionFulfilledMeta, AsyncActionPendingMeta, AsyncActionRejectedMeta} from "../types";
+import type {
+	AsyncActionBeforeExecuteMeta,
+	AsyncActionFulfilledMeta,
+	AsyncActionPendingMeta,
+	AsyncActionRejectedMeta,
+} from "../types";
 import {MessageTypes} from "./constants";
 
 export type StateUpdateVariants =
@@ -51,6 +56,10 @@ export interface StateChangeActionWithPayloadDetail {
 export interface StateChangeAsyncActionDetail {
 	actionName?: string;
 	type: "asyncAction";
-	stage: "pending" | "fulfilled" | "rejected";
-	meta: AsyncActionPendingMeta<any> | AsyncActionFulfilledMeta<any> | AsyncActionRejectedMeta<any>;
+	stage: "beforeExecute" | "pending" | "fulfilled" | "rejected";
+	meta:
+		| AsyncActionBeforeExecuteMeta<any>
+		| AsyncActionPendingMeta<any>
+		| AsyncActionFulfilledMeta<any>
+		| AsyncActionRejectedMeta<any>;
 }

@@ -1,11 +1,11 @@
 import React from "react";
-import {Store} from "./types";
+import type {ResetTrigger, Store} from "./types";
 
 export const getWithStateProviderHoc =
 	<State extends object>(Provider: Store<State>["Provider"]) =>
-	<Props extends Record<string, any>>(Component: React.ComponentType<Props>) =>
+	<Props extends Record<string, any>>(Component: React.ComponentType<Props>, resetTrigger?: ResetTrigger) =>
 	(props: Props) => (
-		<Provider>
+		<Provider resetTrigger={resetTrigger}>
 			<Component {...props} />
 		</Provider>
 	);
