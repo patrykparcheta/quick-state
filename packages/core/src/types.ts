@@ -7,7 +7,7 @@ export interface MakeStoreConfig<State extends object> {
 	initialState: State;
 }
 
-export type CreateActionReturn<State extends object> = State | void | undefined;
+export type ActionReturn<State extends object> = State | void | undefined;
 
 export type TransformState<State extends object> = (
 	producer: StateTransformer<State>,
@@ -16,14 +16,25 @@ export type TransformState<State extends object> = (
 
 export type StateTransformer<State extends object> = (state: Draft<State>) => any;
 
-export type Action<State extends object> = (state: Draft<State>) => CreateActionReturn<Draft<State>>;
+export type Action<State extends object> = (state: Draft<State>) => ActionReturn<Draft<State>>;
 
 export type ActionWithPayload<State extends object, Payload> = (
 	state: Draft<State>,
 	payload: Payload
-) => CreateActionReturn<Draft<State>>;
+) => ActionReturn<Draft<State>>;
 
 export type AsyncActionCreator = (...args: any[]) => Promise<any>;
+
+export type AsyncActionShouldExecuteResult<State extends object, Creator extends AsyncActionCreator> = {
+	shouldExecute: boolean;
+	stateModifier?: AsyncActionBeforeExecuteWithStateModify<State, Creator>;
+};
+
+export type AsyncActionBeforeExecuteMeta<Creator extends AsyncActionCreator> = {
+	parameters: Parameters<Creator>;
+} & {
+	shouldExecute: boolean;
+};
 
 export type AsyncActionPendingMeta<Creator extends AsyncActionCreator> = {
 	parameters: Parameters<Creator>;
@@ -40,19 +51,32 @@ export type AsyncActionRejectedMeta<Creator extends AsyncActionCreator> = {
 };
 
 export type AsyncActionMeta<Creator extends AsyncActionCreator> =
+	| AsyncActionBeforeExecuteMeta<Creator>
 	| AsyncActionFulfilledMeta<Creator>
 	| AsyncActionRejectedMeta<Creator>;
 
+export type AsyncActionBeforeExecuteWithStateModify<State extends object, Creator extends AsyncActionCreator> = (
+	state: Draft<State>,
+	meta: AsyncActionBeforeExecuteMeta<Creator>
+) => ActionReturn<Draft<State>>;
+
 export type AsyncActionWithPayload<State extends object, Creator extends AsyncActionCreator> = {
 	creator: Creator;
-	onPending: (state: Draft<State>, meta: AsyncActionPendingMeta<Creator>) => CreateActionReturn<Draft<State>>;
-	onFulfilled: (state: Draft<State>, meta: AsyncActionFulfilledMeta<Creator>) => CreateActionReturn<Draft<State>>;
-	onRejected: (state: Draft<State>, meta: AsyncActionRejectedMeta<Creator>) => CreateActionReturn<Draft<State>>;
+	beforeExecute?: (
+		state: State,
+		meta: AsyncActionBeforeExecuteMeta<Creator>
+	) => AsyncActionShouldExecuteResult<State, Creator>;
+	onPending: (state: Draft<State>, meta: AsyncActionPendingMeta<Creator>) => ActionReturn<Draft<State>>;
+	onFulfilled: (state: Draft<State>, meta: AsyncActionFulfilledMeta<Creator>) => ActionReturn<Draft<State>>;
+	onRejected: (state: Draft<State>, meta: AsyncActionRejectedMeta<Creator>) => ActionReturn<Draft<State>>;
 };
 
+export type GetState<State extends object> = () => State;
+
 export interface StoreBase<State extends object> {
-	getState: () => State;
+	getState: GetState<State>;
 	setState(state: State, actionName?: string): void;
+	resetState(): void;
 	setKeyValue<Key extends keyof State, KeyValue extends State[Key] extends object ? Partial<State[Key]> : State[Key]>(
 		key: Key,
 		value: KeyValue,
@@ -67,6 +91,8 @@ export interface StoreBase<State extends object> {
 	subscribe: (listener: () => void) => () => void;
 }
 
+export type ResetTrigger = any | (() => any);
+
 export type Selector<State extends object> = (state: State) => any;
 
 export type WithStateProviderHoc = ReturnType<typeof getWithStateProviderHoc>;
@@ -74,6 +100,6 @@ export type WithStateProviderHoc = ReturnType<typeof getWithStateProviderHoc>;
 export interface Store<State extends object> extends StoreBase<State> {
 	createSelector: <Selected extends Selector<State>>(selector: Selected) => () => ReturnType<Selected>;
 	useSelectValue: <Key extends keyof State>(key: Key) => State[Key];
-	Provider: ({children}: {children: React.ReactNode}) => React.JSX.Element;
+	Provider: ({children}: {children: React.ReactNode; resetTrigger?: ResetTrigger}) => React.JSX.Element;
 	withStateProvider: WithStateProviderHoc;
 }

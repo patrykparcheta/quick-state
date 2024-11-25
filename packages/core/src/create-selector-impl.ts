@@ -1,34 +1,17 @@
 import type {Store, StoreBase} from "./types";
-import React, {useContext, useEffect, useState} from "react";
-import {shallowEqual} from "./utils";
+import React, {useContext, useSyncExternalStore} from "react";
 
 export const createSelectorImpl =
 	<State extends object>(StoreContext: React.Context<StoreBase<State> | null>): Store<State>["createSelector"] =>
 	(selector) =>
 	() => {
-		const useEnhancedSelector = () => {
-			const contextStore = useContext(StoreContext) as Store<State>;
+		const contextStore = useContext(StoreContext) as Store<State>;
 
-			if (!contextStore) {
-				throw new Error("Selector must be used within a Provider.");
-			}
+		if (!contextStore) {
+			throw new Error("Selector must be used within a Provider.");
+		}
 
-			const [selectedState, setSelectedState] = useState(() => selector(contextStore.getState()));
+		const selectValue = () => selector(contextStore.getState());
 
-			useEffect(() => {
-				const updateSelectedState = () => {
-					const selectedValue = selector(contextStore.getState());
-					setSelectedState((prev) => (shallowEqual(selectedValue, prev) ? prev : selectedValue));
-				};
-
-				const unsubscribe = contextStore.subscribe(updateSelectedState);
-				updateSelectedState();
-
-				return unsubscribe;
-			}, []);
-
-			return selectedState;
-		};
-
-		return useEnhancedSelector();
+		return useSyncExternalStore(contextStore.subscribe, selectValue, selectValue);
 	};
